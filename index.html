@@ -7,11 +7,16 @@
 
 /* ===== PAGE STYLE ===== */
 body{
-font-family:"Courier New", monospace;
-text-align:center;
-margin:0;
-padding:0;
-background:linear-gradient(to bottom,#ffffff,#dbeafe);
+  font-family:"Courier New", monospace;
+  text-align:center;
+  margin:0;
+  padding:0;
+
+  /* BACKGROUND THEME */
+  background-image: url('simple.jpg');
+  background-size: cover;       /* Cover the whole page */
+  background-repeat: no-repeat; /* Don’t repeat */
+  background-position: center;  /* Center the image */
 }
 
 /* ===== SPLASH SCREEN ===== */
@@ -66,7 +71,7 @@ margin-top:20px;
 /* ===== DEPTH BOXES ===== */
 .box{
 border:2px solid blue;
-background-color:lightblue;
+background-color: rgba(173, 216, 230, 0.8); /* semi-transparent */
 padding:20px;
 width:100px;
 border-radius:10px;
@@ -165,32 +170,25 @@ var currentSong=0;
 
 /* ENTER SITE + START MUSIC */
 document.getElementById("enterBtn").addEventListener("click",function(){
-
 document.getElementById("splash").style.display="none";
 document.getElementById("mainContent").style.display="block";
 
 music.src=playlist[currentSong];
 music.play();
-
 });
 
 /* AUTO NEXT SONG */
 music.addEventListener("ended",function(){
-
 currentSong++;
-
 if(currentSong>=playlist.length){
 currentSong=0;
 }
-
 music.src=playlist[currentSong];
 music.play();
-
 });
 
 /* PLAY / PAUSE BUTTON */
 document.getElementById("playPauseBtn").addEventListener("click",function(){
-
 if(music.paused){
 music.play();
 this.textContent="Pause";
@@ -198,35 +196,26 @@ this.textContent="Pause";
 music.pause();
 this.textContent="Play";
 }
-
 });
 
 /* NEXT BUTTON */
 document.getElementById("nextBtn").addEventListener("click",function(){
-
 currentSong++;
-
 if(currentSong>=playlist.length){
 currentSong=0;
 }
-
 music.src=playlist[currentSong];
 music.play();
-
 });
 
 /* PREVIOUS BUTTON */
 document.getElementById("prevBtn").addEventListener("click",function(){
-
 currentSong--;
-
 if(currentSong<0){
 currentSong=playlist.length-1;
 }
-
 music.src=playlist[currentSong];
 music.play();
-
 });
 
 </script>
