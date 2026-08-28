@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>From Nature to Canvas — Project Calendar</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#f4f6f8;color:#18212b}header{padding:28px;background:#18212b;color:white}
+main{max-width:1100px;margin:auto;padding:20px}.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+button{padding:9px 14px;border:0;border-radius:8px;cursor:pointer}.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.day{background:white;min-height:115px;padding:8px;border-radius:7px}.head{font-weight:bold;text-align:center;padding:8px}
+.event{margin-top:7px;padding:7px;border-radius:6px;background:#e7eef7;font-size:13px;cursor:pointer}
+.panel{display:none;position:fixed;inset:0;background:#0008;align-items:center;justify-content:center}
+.card{background:white;padding:25px;border-radius:14px;max-width:500px;width:90%}li{margin:8px 0}
+.progress{height:10px;background:#ddd;border-radius:10px;overflow:hidden}.bar{height:100%;width:0;background:#4b7bec}
+</style></head><body>
+<header><h1>From Nature to Canvas</h1><p>Personal Project — 10-Week Action Calendar</p></header>
+<main>
+<div class="toolbar"><button onclick="prev()">← Previous</button><h2 id="month"></h2><button onclick="next()">Next →</button></div>
+<div class="grid" id="cal"></div>
+<h3>Project Progress</h3><div class="progress"><div class="bar" id="bar"></div></div>
+<p id="count"></p>
+</main>
+<div class="panel" id="panel" onclick="if(event.target===this)closePanel()"><div class="card"><button style="float:right" onclick="closePanel()">✕</button><h2 id="pt"></h2><ul id="tasks"></ul><button onclick="complete()">Mark week complete</button></div></div>
+<script>
+const events=[{"date":"2026-08-31","end":"2026-09-06","title":"Week 1: Research Foundations","tasks":["Research plant cultivation requirements","Research how plant structures can inspire visual art","Set up project journal and evidence folders"]},{"date":"2026-09-07","end":"2026-09-13","title":"Week 2: Research & Planning","tasks":["Compare possible plants","Research suitable growing conditions and care routines","Finalize plant choices and artistic approach"]},{"date":"2026-09-14","end":"2026-09-20","title":"Week 3: Plant Setup","tasks":["Establish 5 plants","Label each plant","Take baseline photos and measurements","Set up weekly monitoring"]},{"date":"2026-09-21","end":"2026-09-27","title":"Week 4: Growth & Observation","tasks":["Care for all 5 plants","Record growth measurements","Photograph plant structures","Begin sketches"]},{"date":"2026-09-28","end":"2026-10-04","title":"Week 5: Artistic Development","tasks":["Continue plant monitoring","Identify shapes, textures and patterns","Develop first artworks","Record artistic decisions"]},{"date":"2026-10-05","end":"2026-10-11","title":"Week 6: Artistic Development","tasks":["Continue plant care","Create additional artworks","Review progress against the product goal","Update process journal"]},{"date":"2026-10-12","end":"2026-10-18","title":"Week 7: Artistic Development","tasks":["Continue growth tracking","Complete most remaining artworks","Experiment with visual techniques","Document progress"]},{"date":"2026-10-19","end":"2026-10-25","title":"Week 8: Completion & Refinement","tasks":["Complete all 14 artworks","Refine final artworks","Collect final plant evidence","Begin organizing online gallery"]},{"date":"2026-10-26","end":"2026-11-01","title":"Week 9: Gallery & Exhibition Preparation","tasks":["Build online art gallery","Add artwork titles and descriptions","Arrange plants and artworks","Test gallery presentation"]},{"date":"2026-11-02","end":"2026-11-08","title":"Week 10: Exhibition & Evaluation","tasks":["Present online exhibition","Verify 5 plants and 14 artworks are documented","Evaluate against success criteria","Complete final reflection"]}];
+let view=new Date(2026,7,1),completed=JSON.parse(localStorage.getItem('ppDone')||'[]'),current=-1;
+function render(){let y=view.getFullYear(),m=view.getMonth();document.getElementById('month').textContent=view.toLocaleString('default',{month:'long',year:'numeric'});let c=document.getElementById('cal');c.innerHTML=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(x=>`<div class="head">${x}</div>`).join('');let first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();for(let i=0;i<first;i++)c.innerHTML+='<div></div>';for(let d=1;d<=days;d++){let cell=document.createElement('div');cell.className='day';cell.innerHTML='<b>'+d+'</b>';events.forEach((e,i)=>{if(e.date===new Date(y,m,d+1).toISOString().slice(0,10)){let x=document.createElement('div');x.className='event';x.textContent=e.title;x.onclick=()=>openPanel(i);cell.appendChild(x)}});c.appendChild(cell)}update()}
+function openPanel(i){current=i;document.getElementById('pt').textContent=events[i].title;document.getElementById('tasks').innerHTML=events[i].tasks.map(x=>'<li>'+x+'</li>').join('');document.getElementById('panel').style.display='flex'}
+function closePanel(){document.getElementById('panel').style.display='none'}
+function complete(){if(!completed.includes(current))completed.push(current);localStorage.setItem('ppDone',JSON.stringify(completed));closePanel();update()}
+function update(){document.getElementById('bar').style.width=(completed.length/events.length*100)+'%';document.getElementById('count').textContent=completed.length+' of '+events.length+' weeks completed.'}
+function prev(){view.setMonth(view.getMonth()-1);render()} function next(){view.setMonth(view.getMonth()+1);render()} render();
+</script></body></html>
