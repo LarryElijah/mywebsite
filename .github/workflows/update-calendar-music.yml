@@ -1,0 +1,75 @@
+name: Sync calendar music
+
+on:
+  push:
+    paths:
+      - '.github/workflows/update-calendar-music.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update calendar music
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('calendar/index.html')
+          s = p.read_text(encoding='utf-8')
+
+          new_music = r'''let audio=null,currentSong=0,playing=false;
+const playlist=[
+  'https://raw.githubusercontent.com/LarryElijah/Art-Gallery-Online/main/amapiano.mp3',
+  'https://raw.githubusercontent.com/LarryElijah/Art-Gallery-Online/main/Casapiano%20%5B7JDBiyDhZI8%5D.mp3',
+  'https://raw.githubusercontent.com/LarryElijah/Art-Gallery-Online/main/Asake%20x%20Mavo%20Amapiano%20Type%20Beat%20_%20Afrobeat%20Instrumental%202026%20_AURA%20SALAD_%20%5B0PyPdLnchLQ%5D.mp3'
+];
+function musicOn(){
+  if(!audio){
+    audio=new Audio(playlist[currentSong]);
+    audio.volume=+$('volume').value;
+    audio.addEventListener('ended',()=>{
+      currentSong=(currentSong+1)%playlist.length;
+      audio.src=playlist[currentSong];
+      audio.play().catch(()=>{});
+    });
+  }
+  if(audio.paused) audio.play().catch(()=>{});
+  playing=true;
+  $('music').textContent='♫ Music: On';
+  $('mstatus').textContent='ON';
+}
+$('music').onclick=()=>{
+  if(!audio) return musicOn();
+  if(playing){
+    audio.pause();
+    playing=false;
+    $('music').textContent='♫ Music: Off';
+    $('mstatus').textContent='OFF';
+  }else musicOn();
+};
+$('volume').oninput=e=>{if(audio)audio.volume=+e.target.value};'''
+
+          pattern = r"let ac=null,gain=null,playing=false,musicTimer=null;.*?\$\('volume'\)\.oninput=e=>\{if\(gain\)gain\.gain\.value=\+e\.target\.value\};"
+          s2, n = re.subn(pattern, new_music, s, count=1, flags=re.S)
+          if n != 1:
+              raise SystemExit('Music block not found; no changes made.')
+
+          s2 = s2.replace('value=\".16\"', 'value=\".55\"', 1)
+          p.write_text(s2, encoding='utf-8')
+          PY
+
+      - name: Commit change
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add calendar/index.html
+          git diff --cached --quiet && exit 0
+          git commit -m 'Update calendar music to match art gallery'
+          git push
